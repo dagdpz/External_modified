@@ -35,7 +35,7 @@ sortID=[];
 channelID=[];
 
 try
-    h=waitbar(0,'Converting PLX to SPK format');    
+    %h=waitbar(0,'Converting PLX to SPK format');    
     for c = 1:nchans
         fprintf('\n\tChannel %d\n',CHANNELS(c))
         for u = 1:npossunits %unit 1 is 0 though!
@@ -50,9 +50,9 @@ try
             channelID=[channelID; ones(n,1) * c];
         end
     end
-    close(h);    
+    %close(h);    
 catch exception
-    close(h);
+    %close(h);
     rethrow(exception);
 end
 SPK.waveforms=waveforms;

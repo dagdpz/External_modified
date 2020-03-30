@@ -197,8 +197,8 @@ try
         ind = ind + 1;
     end
     fclose(tnt);
-catch
-    warning('TNT file could not be processed')
+catch ghf
+%     warning('TNT file could not be processed')
 end
 
 customSortEvent = '';
@@ -245,9 +245,9 @@ if ismember(3, TYPE) && ~strcmp(SORTNAME, 'TankSort')
     
     % look for the exact one
     [lia, loc] = ismember(SORTNAME, sortIDs.sortID);
-    if ~lia
-        warning('SortID: %s not found\n', SORTNAME);
-    else
+    if ~lia &&~strcmp(SORTNAME,'Plexsormanually')
+        fprintf('SortID: %s not found\n', SORTNAME);
+    elseif lia
         fprintf('Using SortID: %s for event: %s\n', SORTNAME, sortIDs.event{loc});
         customSortEvent = sortIDs.event{loc};
         fid = fopen(sortIDs.fileNames{loc}, 'rb');
@@ -519,7 +519,7 @@ if ~useOutsideHeaders
         if T2 > 0 && lastTS > T2
             break
         end
-        fprintf('read up to t=%.2fs\n', lastTS);
+        %fprintf('read up to t=%.2fs\n', lastTS); % becomes annoying in the pipeline
     end
     
     % put epocs into headerStruct
