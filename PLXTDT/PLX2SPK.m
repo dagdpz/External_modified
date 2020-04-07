@@ -55,7 +55,7 @@ catch exception
     %close(h);
     rethrow(exception);
 end
-SPK.waveforms=waveforms;
+SPK.waveforms=single(waveforms);
 SPK.sortID   =sortID;
 SPK.channelID=channelID;
 SPK.spiketimes=spiketimes;
