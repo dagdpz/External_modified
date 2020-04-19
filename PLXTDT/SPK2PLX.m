@@ -79,7 +79,7 @@ validchs = find(~emptychs);
 clear SPK;
 disp('Start writing PLX file ...');
 tic
-fid = writeplxrilehdr(filename,fs,length(validchs),npw,maxts);
+fid = writeplxfilehdr(filename,fs,length(validchs),npw,maxts);
 for ch = validchs
     writeplxchannelhdr(fid,ch,npw)
 end
@@ -97,7 +97,7 @@ disp('PLX export finished!');
 
 
 
-function plx_id = writeplxrilehdr(filename,freq,nch,npw,maxts)
+function plx_id = writeplxfilehdr(filename,freq,nch,npw,maxts)
 pad256(1:256) = uint8(0);
 
 % create the file and write the file header

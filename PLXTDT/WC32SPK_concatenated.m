@@ -26,7 +26,9 @@ c = tic;
 
 
 channels=handles.channels;                                                   % sort the channel numbers in ascending order
+sr=handles.WC.sr;
 SPK=struct('spiketimes',{[]},'sortID',{[]},'channelID',{[]},'waveforms',{[]});
+SPK.int_factor = handles.WC.int_factor;
 for ii = 1:length(channels)
     ch=channels(ii);
     display(['Scanning "Channel' num2str(ch) '".'])                 % display what channel is processed at the movement
@@ -50,8 +52,8 @@ for ii = 1:length(channels)
         
         %% reduce to only current block times
         blocksamples=handles.blocksamplesperchannel{ch}(handles.block,:);
-        idx=index*handles.sr/1000>=blocksamples(1) & index*handles.sr/1000<=blocksamples(2); %% index at this point is in milliseconds....???
-        index=index(idx)-blocksamples(1)*1000/handles.sr;
+        idx=index*sr/1000>=blocksamples(1) & index*sr/1000<=blocksamples(2); %% index at this point is in milliseconds....???
+        index=index(idx)-blocksamples(1)*1000/sr;
         cluster_class=cluster_class(idx,:);
         spikes=spikes(idx,:);
         
@@ -80,7 +82,7 @@ for ii = 1:length(channels)
     end
 end
 
-SPK.samplingrate=handles.par.sr;
+SPK.samplingrate=sr;
 SPK.physicalunit='µV';
 
 %############################ Create Neuronobj ############################
