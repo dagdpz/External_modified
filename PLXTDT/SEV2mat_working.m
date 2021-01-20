@@ -311,13 +311,13 @@ for ev = 1:numel(eventNames)
     end
     
     data.(file_list_temp(1).varName).channels = channels;
-    loop = channels;
+    loop = channels(~isnan(channels));
     
     % loop through the time ranges
     for ii = 1:numRanges
         
         % loop through the channels
-        ind = 1;
+        %ind = 1;
         for jj = loop
             chanIndex = 1;
             matching_ch = find([file_list_temp.chan] == jj);
@@ -358,7 +358,7 @@ for ev = 1:numel(eventNames)
                 fread(fid, firstSample, dForm);
                 readSize = lastSample - firstSample;
                 
-                data.(varname).data{ii}(ind, chanIndex:chanIndex + readSize - 1) = fread(fid, readSize, ['*' dForm])';
+                data.(varname).data{ii}(jj, chanIndex:chanIndex + readSize - 1) = fread(fid, readSize, ['*' dForm])';
                 chanIndex = chanIndex + readSize;
                 
                 % close file
@@ -372,7 +372,7 @@ for ev = 1:numel(eventNames)
                 %  ind = ind + 1;
             end
             %% ind indicates channel? then it should be increased here instead of inside the previous loop!
-            ind = ind + 1;
+            %ind = ind + 1;
             data.(varname).data{ii} = data.(varname).data{ii}(:,1:chanIndex-1);
         end
     end

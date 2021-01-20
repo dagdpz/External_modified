@@ -960,7 +960,7 @@ for ii = 1:numel(storeNames)
             end
             
             headerStruct.stores.(currentName) = d.(currentName);
-            headerStruct.stores.(currentName).startTime = 0;
+            headerStruct.stores.(currentName).startTime = {0};
         else
             headerStruct.stores.(currentName).data = cell(1,numRanges);
             for jj = 1:numRanges
