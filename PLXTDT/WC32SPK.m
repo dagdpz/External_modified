@@ -65,9 +65,9 @@ for ii = 1:length(channels)
     display(['Scanning folder "Channel' num2str(ch) '".'])                 % display what channel is processed at the movement
     
     switch handles.threshold
-        case 'pos', filenames={[tank '\dataspikes_ch' sprintf('%03d',ch) '_onethr.mat' ]};
-        case 'neg',  filenames={[tank '\dataspikes_ch' sprintf('%03d',ch) '_onethr.mat' ]};
-        case 'both', filenames={[tank '\dataspikes_ch' sprintf('%03d',ch) '_negthr.mat' ],[tank '\dataspikes_ch' sprintf('%03d',ch) '_posthr.mat' ]};
+        case 'pos', filenames={[tank '\dataspikes_ch' sprintf('%03d',ch) '_SU_pos.mat' ]};
+        case 'neg',  filenames={[tank '\dataspikes_ch' sprintf('%03d',ch) '_SU_neg.mat' ]};
+        case 'both', filenames={[tank '\dataspikes_ch' sprintf('%03d',ch) '_SU_neg.mat' ],[tank '\dataspikes_ch' sprintf('%03d',ch) '_posthr.mat' ]};
     end
     
     %load([tank '\times_' block '_' num2str(ch) '.mat'],'cluster_class','spikes', 'par')               % load sort ids and spike times from WaveClus file
@@ -80,7 +80,7 @@ for ii = 1:length(channels)
     wf=SPK.waveforms;
     maxsortid=0;
     for f=1:numel(filenames) % important for case of both thresholds...!
-    load(filenames{f},'cluster_class','index','spikes')               % load sort ids and spike times from WaveClus file
+    load(filenames{f},'cluster_class','index','spikes','par')               % load sort ids and spike times from WaveClus file
     
     % spike times
     spkt=[spkt; single(index/1000)];
@@ -126,7 +126,7 @@ for ii = 1:length(channels)
     end
 end
 
-SPK.samplingrate=handles.par.sr;
+SPK.samplingrate=par.sr;
 SPK.physicalunit='µV';
 
 %############################ Create Neuronobj ############################
