@@ -417,9 +417,9 @@ if isvector(options)
     try
         % Workaround for when transparency is lost through conversion fig>EPS>PDF (issue #108)
         % Replace transparent patch RGB values with an ID value (rare chance that ID color is being used already)
-%         if options.transparent
-%             origAlphaColors = eps_maintainAlpha(fig);
-%         end
+        if options.transparent
+            [origAlphaColors, ars] = eps_maintainAlpha(fig);
+        end
         
         % Generate an eps
         print2eps(tmp_nam, fig, p2eArgs{:});
@@ -427,9 +427,9 @@ if isvector(options)
         
         % Restore colors for transparent patches and apply the
         % setopacityalpha setting in the EPS file (issue #108)
-%         if options.transparent
-%             eps_maintainAlpha(fig, tmp_nam, origAlphaColors);
-%         end
+        if options.transparent
+            eps_maintainAlpha(fig, tmp_nam, origAlphaColors, ars);
+        end
                 
         % Remove the background, if desired
         if options.transparent && ~isequal(get(fig, 'Color'), 'none')
@@ -839,16 +839,24 @@ end
 fclose(fh);
 return
 
-function [StoredColors] = eps_maintainAlpha( fig_, eps_filename, StoredColors)
+function [StoredColors, ars] = eps_maintainAlpha( fig_, eps_filename, StoredColors, ars)
 if nargin == 1
     ars = findobj(fig_,'Type','patch');
     StoredColors={};
+    valid_ar=[];
     for ar = 1:length(ars)
-        if strcmp(ars(ar).Face.ColorType, 'truecoloralpha')
-            StoredColors{end+1}=ars(ar).Face.ColorData;
-            ars(ar).Face.ColorData = uint8([101; 102; length(StoredColors); 255]);
+        if get(ars(ar),'Facealpha')<1
+            StoredColors{end+1}=[get(ars(ar),'Facecolor') get(ars(ar),'Facealpha')];%ars(ar).Face.ColorData;
+            set(ars(ar),'Facealpha',1); %?
+            set(ars(ar),'Facecolor',[101 102 length(StoredColors)]/255); %?
+            %ars(ar).Face.ColorData = uint8([101; 102; length(StoredColors); 255]);
+            valid_ar(ar)=1;
+        else
+            valid_ar(ar)=0;
         end
     end
+    
+    ars=ars(valid_ar==1);
 else
     
     try
@@ -858,25 +866,31 @@ else
         fstrm = '';
     end
     %Find the transparent patches
-    ars = findobj(fig_,'Type','Area');
+    %ars = findobj(fig_,'Type','patch');
     ar_stored = 0;
     try
         for ar = 1:length(ars)
-            if strcmp(ars(ar).Face.ColorType, 'truecoloralpha')
-                ar_stored = ar_stored + 1;
-                stored = StoredColors{ar_stored}';
-                %Restore the EPS files patch color
-                colorID = num2str(round([101 102 ar_stored]/255,3),'%.3g %.3g %.3g'); %ID for searching
-                originalColor = num2str(round(double(stored(1:end-1))/255,3),'%.3g %.3g %.3g'); %Replace with original color
-                alpha_ = num2str(round(double(stored(end))/255,3),'%.3g'); %Convert alpha value for EPS
-                %Find and replace
-                fstrm = strrep(fstrm, ...
-                    sprintf(['CT\n' colorID ' RC\nN\n']), ...
-                    sprintf(['CT\n' originalColor ' RC\n' alpha_ ' .setopacityalpha true\nN\n']));
-                
-                %Restore the figures patch color
-                ars(ar).Face.ColorData = StoredColors{ar_stored};
+            %if strcmp(ars(ar).Face.ColorType, 'truecoloralpha')
+            ar_stored = ar_stored + 1;
+            stored = StoredColors{ar_stored};
+            %Restore the EPS files patch color            
+            alpha_ = sprintf('%.6f',round(double(stored(end))*1000)/1000); %Convert alpha value for EPS            
+            colorID = sprintf(' %.6f %.6f %.6f sr} bdef',round([101 102 ar_stored]/255*1000000)/1000000);
+            originalColor = sprintf(['%.6f %.6f %.6f '],round(stored(1:end-1)*1000000)/1000000);
+            ix=findstr(fstrm,colorID);
+            fstrm = strrep(fstrm,colorID,sprintf([originalColor 'sr} bdef \n ' alpha_ ' .setopacityalpha true\n']));
+            ix2=findstr(fstrm(ix:end),sprintf('\nc'));
+            if numel(ix2)>1
+                ix3=ix+ix2(2);
+                if ~strcmp(fstrm(ix3-23:ix3-3),'.setopacityalpha true')
+                fstrm=[fstrm(1:ix3-2) sprintf('\n 1 .setopacityalpha false') fstrm(ix3-1:end)];
+                end
             end
+            
+            %Restore the figures patch color
+            set(ars(ar),'Facealpha',stored(end)); %?
+            set(ars(ar),'Facecolor',stored(1:end-1)'); %?
+            %end
         end
     catch err
         fprintf(2, 'Error maintaining transparency in EPS file: %s\n at %s:%d\n', err.message, err.stack(1).file, err.stack(1).line);
