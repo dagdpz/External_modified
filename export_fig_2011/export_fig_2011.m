@@ -863,7 +863,7 @@ else
     try
         % Read the EPS file into memory
         fstrm = read_write_entire_textfile(eps_filename);
-    catch
+    catch rrr
         fstrm = '';
     end
     %Find the transparent patches
