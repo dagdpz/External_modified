@@ -1,5 +1,8 @@
 function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
 matlabversion=datevec(version('-date'));
+if nargin < 5
+   transparent=0; 
+end
 if matlabversion(1)>=2014
     out=shadedErrorBar_2014(x,y,errBar,'lineprops',lineProps,'transparent',transparent);
 else
