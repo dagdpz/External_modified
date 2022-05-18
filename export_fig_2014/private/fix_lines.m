@@ -44,7 +44,7 @@ function fstrm = fix_lines(fstrm, fname2)
 
 % Issue #20: warn users if using this function in HG2 (R2014b+)
 if using_hg2
-    warning('export_fig:hg2','The fix_lines function should not be used in this Matlab version.');
+    %warning('export_fig:hg2','The fix_lines function should not be used in this Matlab version.');
 end
     
 if nargout == 0 || nargin > 1

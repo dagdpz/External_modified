@@ -391,7 +391,7 @@ try
             symbolIdx = ~cellfun('isempty',strfind({texLabels.String},'\'));
             if ~isempty(symbolIdx)
                 set(texLabels(symbolIdx), 'FontWeight','normal');
-                warning('export_fig:BoldTexLabels', 'Bold labels with Tex symbols converted into non-bold in export_fig (fix for issue #69)');
+                %warning('export_fig:BoldTexLabels', 'Bold labels with Tex symbols converted into non-bold in export_fig (fix for issue #69)');
             end
         end
     end
@@ -445,9 +445,7 @@ if hasTransparency
     % http://www.mathworks.com/matlabcentral/answers/265265-can-export_fig-or-else-draw-vector-graphics-with-transparent-surfaces
     % TODO - use transparency when exporting to PDF by not passing via print2eps
     msg = 'export_fig currently supports transparent patches/areas only in PNG output. ';
-    if options.pdf
-        warning('export_fig:transparency', '%s\nTo export transparent patches/areas to PDF, use the print command:\n print(gcf, ''-dpdf'', ''%s.pdf'');', msg, options.name);
-    elseif ~options.png && ~options.tif  % issue #168
+    if ~options.pdf && ~options.png && ~options.tif  % issue #168
         warning('export_fig:transparency', '%s\nTo export the transparency correctly, try using the ScreenCapture utility on the Matlab File Exchange: http://bit.ly/1QFrBip', msg);
     end
 elseif ~isempty(hImages)
