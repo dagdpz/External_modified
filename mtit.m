@@ -115,7 +115,8 @@ function	par=mtit(varargin)
 			ap(2)-ap(1),ap(4)-ap(3)];
 
 % create axis...
-		xh=axes('position',ap);
+		xh=axes('parent',figh);
+		set(xh,'position',ap);
 % ...and title
 		th=title(txt,vout{:});
 		tp=get(th,'position');
